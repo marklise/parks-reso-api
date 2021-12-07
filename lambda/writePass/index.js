@@ -10,8 +10,14 @@ exports.handler = async (event, context) => {
     TableName: process.env.TABLE_NAME
   };
 
+  if (!event) {
+    return sendResponse(400, {
+      msg: 'There was an error in your submission.',
+      title: 'Bad Request'
+    }, context);
+  }
+
   try {
-    console.log(event.body);
     let newObject = JSON.parse(event.body);
 
     const registrationNumber = generate(10);
@@ -33,17 +39,26 @@ exports.handler = async (event, context) => {
     } = newObject;
 
     if (!captchaJwt || !captchaJwt.length) {
-      return sendResponse(400, { msg: 'Missing CAPTCHA verification' });
+      return sendResponse(400, { 
+                                 msg: 'Missing CAPTCHA verification.', 
+                                 title: 'Missing CAPTCHA verification'
+                               });
     }
 
     const verification = verifyJWT(captchaJwt);
     if (!verification.valid) {
-      return sendResponse(400, { msg: 'CAPTCHA verification failed' });
+      return sendResponse(400, { 
+                                 msg: 'CAPTCHA verification failed.', 
+                                 title: 'CAPTCHA verification failed'
+                               });
     }
 
     // Enforce maximum limit per pass
     if (facilityType === 'Trail' && numberOfGuests > 4) {
-      return sendResponse(400, { msg: 'Operation Failed' });
+      return sendResponse(400, { 
+                                 msg: 'You cannot have more than 4 guests on a trail.', 
+                                 title: 'Too many guests'
+                               });
     }
 
     if (facilityType === 'Parking') {
@@ -140,11 +155,14 @@ exports.handler = async (event, context) => {
         const existingItems = await dynamodb.query(existingPassCheckObject).promise();
 
         if (existingItems.Count > 0) {
-          return sendResponse(400, { msg: 'Duplicate pass exists' });
+          return sendResponse(400, {
+            title: 'This email account already has a reservation for this booking time.',
+            msg: 'A reservation associated with this email for this booking time already exists. Please check to see if you already have a reservation for this time. If you do not have an email confirmation of your reservation please contact <a href="mailto:parkinfo@gov.bc.ca">parkinfo@gov.bc.ca</a>'
+          });
         }
       } catch (err) {
         console.log('err', err);
-        return sendResponse(400, { msg: 'Operation Failed' });
+        return sendResponse(400, { msg: 'Something went wrong.', title:'Operation Failed' });
       }
 
       try {
@@ -252,11 +270,11 @@ exports.handler = async (event, context) => {
       }
     } else {
       // Not allowed for whatever reason.
-      return sendResponse(400, { msg: 'Operation Failed' });
+      return sendResponse(400, { msg: 'Something went wrong.', title:'Operation Failed' });
     }
   } catch (err) {
     console.log('err', err);
-    return sendResponse(400, { msg: 'Operation Failed' });
+    return sendResponse(400, { msg: 'Something went wrong.', title:'Operation Failed' });
   }
 };
 
