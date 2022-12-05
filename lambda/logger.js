@@ -1,7 +1,7 @@
 const { createLogger, format, transports } = require('winston');
 const { combine, timestamp } = format;
 
-const LEVEL = process.env.LOG_LEVEL || 'error';
+const LEVEL = process.env.LOG_LEVEL || 'debug';
 
 exports.logger = createLogger({
   level: LEVEL,
