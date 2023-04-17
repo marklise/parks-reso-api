@@ -17,7 +17,7 @@
     "qrcode": "^1.5.1",
     "svg-captcha": "^1.4.0",
     "uuid": "^9.0.0",
-    "winston": "^3.7.2"
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.44.0",
@@ -36,6 +36,7 @@
     "start": "sls offline start",
     "build": "sls package --package ./artifacts",
     "build-ci": "sls package --package ./terraform/src/artifacts",
+    "build-my-layer": "npm install lambda/layers/my-layer --prefix lambda/layers/my-layer && zip -r artifacts/my-layer.zip lambda/layers/my-layer",
     "test": "cross-env IS_OFFLINE=1 TABLE_NAME=parksreso-tests jest --coverage",
     "migration": "node ./node_modules/@digitalspace/dynamodb-migrate/migrate.js"
   },

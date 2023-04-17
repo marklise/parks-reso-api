@@ -20,6 +20,6 @@ variable "env_identifier" {
   # For DUP merges - this should remain "" as dev/test/prod do not have these.  This is only for 
   # the sandbox environment to split up between developers by making your own unique environment
   # set to "-something"
-  default = ""
+  default = "-mark"
   description = "Default string resource identifier"
 }

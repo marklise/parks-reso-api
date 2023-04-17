@@ -3,6 +3,7 @@ const s3 = new AWS.S3();
 const { runScan, TABLE_NAME } = require("../../dynamoUtil");
 const { updateJobEntry } = require("../functions");
 const { logger } = require('../../logger');
+// const { logger } = require('/opt/lambda/layers/my-layer/index');
 const csvjson = require('csvjson');
 
 const FILE_NAME = process.env.FILE_NAME || "DUP_Export";
@@ -14,6 +15,7 @@ const DISABLE_PROGRESS_UPDATES =
     : false;
 
 exports.handler = async (event, context) => {
+  logger.info("EXPORT");
   logger.debug("EXPORT", event || {});
 
   let queryObj = {
@@ -32,6 +34,7 @@ exports.handler = async (event, context) => {
       queryObj.ExpressionAttributeValues[':pk'] = { S: 'pass::' };
       queryObj.FilterExpression = 'contains (pk, :pk)';
 
+      logger.info("Fetching all passes");
       await updateJobWithState(jobid, null, 1, "Fetching all passes.", 10);
 
       let scanResults = [];
@@ -41,6 +44,7 @@ exports.handler = async (event, context) => {
           passData.data.forEach((item) => scanResults.push(item));
           queryObj.ExclusiveStartKey = passData.LastEvaluatedKey;
       } while (typeof passData.LastEvaluatedKey !== "undefined");
+      logger.info("Converting to CSV");
       await updateJobWithState(jobid, null, 2, "Converting to CSV", 50);
 
       const csvData = csvjson.toCSV(scanResults);
@@ -57,14 +61,16 @@ exports.handler = async (event, context) => {
       try {
         // Upload file
         res = await s3.putObject(params).promise();
+        logger.info("Export Ready");
         await updateJobWithState(jobid, s3Key, 7, "Export ready.", 100);
 
       } catch (err) {
+        logger.info("Job Failed");
         await updateJobWithState(jobid, null, 1, "Job Failed", -1);
         logger.error(err);
       }
 
-      logger.debug("=== Export successful ===");
+      logger.info("=== Export successful ===");
     }
   } catch (err) {
     logger.error(err);

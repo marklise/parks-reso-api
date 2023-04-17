@@ -1,0 +1,20 @@
+{
+  "parksreso4BE83E57": {
+    "TableName": "parksreso"
+  },
+  "parksresometrics55048EB2": {
+    "TableName": "parksreso-metrics"
+  },
+  "parksresometaADB5191A": {
+    "TableName": "parksreso-meta"
+  },
+  "dupapigenerateCaptcha542DEE73": {
+    "FunctionName": "generateCaptcha"
+  },
+  "dupapigenerateCaptchaServiceRole3B816E4E": {
+    "RoleName": "lambdaExecutionRole"
+  },
+  "dupapi4E0885FE": {
+    "foo": "fum"
+  }
+}

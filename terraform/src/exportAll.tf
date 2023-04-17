@@ -12,6 +12,8 @@ resource "aws_lambda_function" "exportAllInvokableLambda" {
   timeout = 120
   memory_size = 2048
 
+  layers = [aws_lambda_layer_version.my-layer-version.arn]
+
   environment {
     variables = {
       TABLE_NAME                   = aws_dynamodb_table.park_dup_table.name,
