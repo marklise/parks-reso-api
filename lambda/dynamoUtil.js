@@ -522,7 +522,6 @@ async function restoreAvailablePass(pk, sk, orcNumber, shortPassDate, facilityNa
             }
           }
         },
-        ,
         {
           Delete: {
             TableName: TABLE_NAME,
